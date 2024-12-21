@@ -11,19 +11,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.apsmt.notes.data.NoteViewModel
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.apsmt.notes.databinding.FragmentListBinding
 
 
 class ListFragment : Fragment() {
 
-    private lateinit var floatingAddBtn: FloatingActionButton
-    private lateinit var recyclerView: RecyclerView
+    private  var _binding: FragmentListBinding? = null
+    private  val binding get() = _binding!!
+
     private lateinit var mNoteViewModel: NoteViewModel
 
     override fun onCreateView(
@@ -31,28 +29,23 @@ class ListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_list, container, false)
+        _binding = FragmentListBinding.inflate(inflater, container, false)
 
-        floatingAddBtn = view.findViewById(R.id.floatingBtnAdd)
-        floatingAddBtn.setOnClickListener {
+        binding.floatingBtnAdd.setOnClickListener {
             findNavController().navigate(R.id.action_listFragment_to_addFragment)
         }
-
         mNoteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
-        recyclerView = view.findViewById(R.id.recyclerView)
 
         val adapter = AdapterClass()
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(requireContext(),2)
+        binding.recyclerView.adapter = adapter
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(),2)
 
         mNoteViewModel.readAllNotes.observe(viewLifecycleOwner){ addNotes ->
             adapter.setData(addNotes)
         }
 
         setHasOptionsMenu(true)
-
-
-        return view
+        return binding.root
     }
 
     @Deprecated("Deprecated in Java", ReplaceWith("inflater.inflate(R.menu.delete_menu, menu)"))
@@ -94,5 +87,10 @@ class ListFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }.create().show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

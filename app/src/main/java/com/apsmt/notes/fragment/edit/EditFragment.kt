@@ -17,14 +17,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.apsmt.notes.data.NoteViewModel
 import com.apsmt.notes.data.Notes
+import com.apsmt.notes.databinding.FragmentEditBinding
+import com.apsmt.notes.databinding.FragmentListBinding
 
 class EditFragment : Fragment() {
 
-    private lateinit var updateTitle: EditText
-    private lateinit var updateDescription: EditText
-    private lateinit var update: Button
-    private lateinit var mNoteViewModel: NoteViewModel
+    private  var _binding: FragmentEditBinding? = null
+    private  val binding get() = _binding!!
 
+    private lateinit var mNoteViewModel: NoteViewModel
     private val args: EditFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -32,29 +33,25 @@ class EditFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_edit, container, false)
+        _binding = FragmentEditBinding.inflate(inflater, container, false)
 
         mNoteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
 
-        updateTitle = view.findViewById(R.id.edtUpdateTitle)
-        updateDescription = view.findViewById(R.id.edtUpdateDescription)
-        update = view.findViewById(R.id.btnUpdate)
+        binding.edtUpdateTitle.setText(args.currentNote.title)
+        binding.edtUpdateDescription.setText(args.currentNote.description)
 
-        updateTitle.setText(args.currentNote.title)
-        updateDescription.setText(args.currentNote.description)
-
-        update.setOnClickListener {
+        binding.btnUpdate.setOnClickListener {
             updateNote()
         }
 
         setHasOptionsMenu(true)
 
-        return view
+        return binding.root
     }
 
     private fun updateNote(){
-        val title = updateTitle.text.toString()
-        val description = updateDescription.text.toString()
+        val title = binding.edtUpdateTitle.text.toString()
+        val description =binding.edtUpdateDescription.text.toString()
 
         if(title.isNotEmpty() && description.isNotEmpty()){
             val updateNote = Notes(
